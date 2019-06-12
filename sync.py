@@ -1,5 +1,6 @@
 import todoist
 import sys
+import json
 
 def getProjectId(projectName):
     for proj in api.state['projects']:
@@ -24,11 +25,20 @@ def setTemplate(projectId, file):
     api.templates.import_into_project(projectId, file)
 
 print 'main'
+
 api = todoist.TodoistAPI(sys.argv[1])
 api.sync()
-currentProjectId = getProjectId('backpack-home')
-print currentProjectId
-removeAllItemsFromProject(currentProjectId)
-setTemplate(currentProjectId, 'backpack-home.csv')
+
+#load projects
+with open(sys.argv[2], 'r') as file:
+    jdata = json.load(file)
+
+for p in jdata['projects']:
+    projectName = p['name']
+    projectTemplateFile = p['templateFile']
+    currentProjectId = getProjectId(projectName)
+    print currentProjectId
+    removeAllItemsFromProject(currentProjectId)
+    setTemplate(currentProjectId, projectTemplateFile)
 
 
